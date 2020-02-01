@@ -4,16 +4,19 @@
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
 #
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
+#threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
+threads_count = Integer(ENV['RAILS_MAX_THREADS'] || 5)
 threads threads_count, threads_count
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 #
-port        ENV.fetch("PORT") { 3000 }
+# port        ENV.fetch("PORT") { 3000 }
+port        ENV['PORT']     || 3000
 
 # Specifies the `environment` that Puma will run in.
 #
-environment ENV.fetch("RAILS_ENV") { "development" }
+# environment ENV.fetch("RAILS_ENV") { "development" }
+environment ENV['RACK_ENV'] || 'development'
 
 # Specifies the number of `workers` to boot in clustered mode.
 # Workers are forked webserver processes. If using threads and workers together
@@ -22,6 +25,7 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # processes).
 #
 # workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+workers Integer(ENV['WEB_CONCURRENCY'] || 2)
 
 # Use the `preload_app!` method when specifying a `workers` number.
 # This directive tells Puma to first boot the application and load code
@@ -30,7 +34,7 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # you need to make sure to reconnect any threads in the `on_worker_boot`
 # block.
 #
-# preload_app!
+preload_app!
 
 # If you are preloading your application and using Active Record, it's
 # recommended that you close any connections to the database before workers
@@ -48,26 +52,15 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # cannot share connections between processes.
 #
 # on_worker_boot do
-#   ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+#  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
 # end
-#
-
-# Allow puma to be restarted by `rails restart` command.
-plugin :tmp_restart
-
-workers Integer(ENV['WEB_CONCURRENCY'] || 2)
-threads_count = Integer(ENV['RAILS_MAX_THREADS'] || 5)
-threads threads_count, threads_count
-
-preload_app!
-
-rackup      DefaultRackup
-port        ENV['PORT']     || 3000
-environment ENV['RACK_ENV'] || 'development'
-
 on_worker_boot do
   # Worker specific setup for Rails 4.1+
   # See: https://devcenter.heroku.com/articles/
   # deploying-rails-applications-with-the-puma-web-server#on-worker-boot
   ActiveRecord::Base.establish_connection
 end
+#
+
+# Allow puma to be restarted by `rails restart` command.
+plugin :tmp_restart
